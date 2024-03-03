@@ -4,67 +4,199 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tarot Reading</title>
+  <title>Brick Breaker</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f9f9f9;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      background-color: #f0f0f0;
     }
 
-    .container {
-      text-align: center;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    .card {
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin: 10px;
-      cursor: pointer;
-    }
-
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
+    canvas {
+      border: 1px solid #333;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Tarot Reading</h1>
-    <p>Click on the cards to reveal your destiny...</p>
-    <div class="card" onclick="revealCard(1)">Card 1</div>
-    <div class="card" onclick="revealCard(2)">Card 2</div>
-    <div class="card" onclick="revealCard(3)">Card 3</div>
-    <div id="result"></div>
-  </div>
+  <canvas id="brickBreakerCanvas" width="480" height="320"></canvas>
   <script>
-    function revealCard(cardNumber) {
-      const resultElement = document.getElementById('result');
-      const card = `Card ${cardNumber}`;
+    const canvas = document.getElementById("brickBreakerCanvas");
+    const ctx = canvas.getContext("2d");
 
-      // Simulate tarot reading logic (replace with your actual logic)
-      const interpretations = [
-        'A new opportunity is on the horizon.',
-        'Embrace change and be open to new experiences.',
-        'Focus on self-discovery and personal growth.'
-      ];
+    // Paddle properties
+    const paddleHeight = 10;
+    const paddleWidth = 75;
+    let paddleX = (canvas.width - paddleWidth) / 2;
 
-      const randomIndex = Math.floor(Math.random() * interpretations.length);
-      const interpretation = interpretations[randomIndex];
+    // Paddle movement
+    let rightPressed = false;
+    let leftPressed = false;
 
-      // Display result
-      resultElement.innerHTML = `<p>${card}: ${interpretation}</p>`;
+    // Ball properties
+    let ballRadius = 10;
+    let x = canvas.width / 2;
+    let y = canvas.height - 30;
+    let dx = 2;
+    let dy = -2;
+
+    // Brick properties
+    const brickRowCount = 3;
+    const brickColumnCount = 5; // Adjusted to have more bricks
+    const brickWidth = 75;
+    const brickHeight = 20;
+    const brickPadding = 5; // Adjusted for smaller padding
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 5; // Adjusted to have no left padding
+
+    let bricks = createBricks();
+
+    let gameStarted = false;
+
+    // Event listeners for paddle movement
+    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keyup", keyUpHandler);
+    document.addEventListener("click", startGame);
+
+    function keyDownHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = true;
+      } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = true;
+      }
     }
+
+    function keyUpHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = false;
+      } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = false;
+      }
+    }
+
+    function startGame() {
+      if (!gameStarted) {
+        gameStarted = true;
+        interval = setInterval(draw, 10);
+      }
+    }
+
+    function createBricks() {
+      const bricksArray = [];
+      for (let c = 0; c < brickColumnCount; c++) {
+        bricksArray[c] = [];
+        for (let r = 0; r < brickRowCount; r++) {
+          bricksArray[c][r] = { x: 0, y: 0, status: 1 };
+        }
+      }
+      return bricksArray;
+    }
+
+    // Collision detection for bricks
+    function collisionDetection() {
+      let totalBricks = 0;
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          const b = bricks[c][r];
+          if (b.status === 1) {
+            totalBricks++;
+            if (
+              x + ballRadius > b.x &&
+              x - ballRadius < b.x + brickWidth &&
+              y + ballRadius > b.y &&
+              y - ballRadius < b.y + brickHeight
+            ) {
+              dy = -dy;
+              b.status = 0; // Mark the brick as broken
+            }
+          }
+        }
+      }
+      if (totalBricks === 0) {
+        alert("축하합니다! 모든 벽돌을 깼습니다!");
+        document.location.reload();
+        clearInterval(interval);
+      }
+    }
+
+    // Draw paddle on the canvas
+    function drawPaddle() {
+      ctx.beginPath();
+      ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+      ctx.fillStyle = "#0095DD";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    // Draw ball on the canvas
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "#0095DD";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    // Draw bricks on the canvas
+    function drawBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          if (bricks[c][r].status === 1) {
+            const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+            const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+      }
+    }
+
+    // Draw the entire canvas
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBricks();
+      drawBall();
+      drawPaddle();
+      collisionDetection();
+
+      // Bounce off walls
+      if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+      }
+
+      // Bounce off ceiling
+      if (y + dy < ballRadius) {
+        dy = -dy;
+      } else if (y + dy > canvas.height - ballRadius) {
+        // Check if the ball hits the paddle
+        if (x + ballRadius > paddleX && x - ballRadius < paddleX + paddleWidth && y + ballRadius > canvas.height - paddleHeight) {
+          dy = -dy;
+        } else {
+          // Game over if the ball hits the bottom edge
+          alert("게임 오버! 다시 시도하세요.");
+          document.location.reload();
+          clearInterval(interval);
+        }
+      }
+
+      // Move paddle
+      if (rightPressed && paddleX < canvas.width - paddleWidth) {
+        paddleX += 7;
+      } else if (leftPressed && paddleX > 0) {
+        paddleX -= 7;
+      }
+
+      x += dx;
+      y += dy;
+    }
+
   </script>
 </body>
 </html>
