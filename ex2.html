@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick Breaker</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* 화면 넘침 방지 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="brickBreakerCanvas" width="480" height="320"></canvas>
+  <script>
+    const canvas = document.getElementById("brickBreakerCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Paddle properties
+    const paddleHeight = 10;
+    const paddleWidth = 75;
+    let paddleX = (canvas.width - paddleWidth) / 2;
+
+    // Paddle movement
+    let rightPressed = false;
+    let leftPressed = false;
+
+    // Ball properties
+    let ballRadius = 10;
+    let x = canvas.width / 2;
+    let y = canvas.height - 30;
+    let dx = 2;
+    let dy = -2;
+
+    // Brick properties
+    const brickRowCount = 3;
+    const brickColumnCount = 5; // Adjusted to have more bricks
+    const brickWidth = 75;
+    const brickHeight = 20;
+    const brickPadding = 5; // Adjusted for smaller padding
+    const brickOffsetTop = 30;
+    const brickOffsetLeft = 5; // Adjusted to have no left padding
+
+    let bricks = createBricks();
+
+    let gameStarted = false;
+
+    // Event listeners for paddle movement
+    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keyup", keyUpHandler);
+    document.addEventListener("click", startGame);
+
+    function keyDownHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = true;
+      } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = true;
+      }
+    }
+
+    function keyUpHandler(e) {
+      if (e.key === "Right" || e.key === "ArrowRight") {
+        rightPressed = false;
+      } else if (e.key === "Left" || e.key === "ArrowLeft") {
+        leftPressed = false;
+      }
+    }
+
+    function startGame() {
+      if (!gameStarted) {
+        gameStarted = true;
+        interval = setInterval(draw, 10);
+      }
+    }
+
+    function createBricks() {
+      const bricksArray = [];
+      for (let c = 0; c < brickColumnCount; c++) {
+        bricksArray[c] = [];
+        for (let r = 0; r < brickRowCount; r++) {
+          bricksArray[c][r] = { x: 0, y: 0, status: 1 };
+        }
+      }
+      return bricksArray;
+    }
+
+    function collisionDetection() {
+      let totalBricks = 0;
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          const b = bricks[c][r];
+          if (b.status === 1) {
+            totalBricks++;
+            if (
+              x + ballRadius > b.x &&
+              x - ballRadius < b.x + brickWidth &&
+              y + ballRadius > b.y &&
+              y - ballRadius < b.y + brickHeight
+            ) {
+              dy = -dy;
+              b.status = 0;
+            }
+          }
+        }
+      }
+      if (totalBricks === 0) {
+        alert("축하합니다! 모든 벽돌을 깼습니다!");
+        document.location.reload();
+        clearInterval(interval);
+      }
+    }
+
+    function drawPaddle() {
+      ctx.beginPath();
+      ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+      ctx.fillStyle = "#0095DD";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "#0095DD";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          if (bricks[c][r].status === 1) {
+            const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+            const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#0095DD";
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBricks();
+      drawBall();
+      drawPaddle();
+      collisionDetection();
+
+      if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+      }
+
+      if (y + dy < ballRadius) {
+        dy = -dy;
+      } else if (y + dy > canvas.height - ballRadius
