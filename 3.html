@@ -1,22 +1,65 @@
 <!DOCTYPE html> 
 <html>
 <head>
-    <title>WEB1 - JavaScript</title>
+    <title>WEB1 - css</title>
     <meta charset="utf-8">
+    <style>
+        #grid {
+        display:grid;
+        grid-template-columns: 150px 1fr;
+        }
+        #article {
+        border-left: 1px solid gray;
+        padding-left: 25px;
+        }
+        body {
+        margin: 0;
+        }
+        a {
+        color:black;
+        text-decoration: none;
+        }
+        h1 {
+        text-align:center;
+        font-size: 45px;
+        border-bottom: 1px solid #000; /* 아래쪽에만 1px 두께의 검정색 테두리 추가 */
+        margin: 0; /* 위아래 여백을 조절할 수 있습니다. */
+        padding: 20px;
+        }
+        #grid ol {
+        font-size: 20px;
+        width: 150px;
+        margin: 0;
+        padding: 20px;
+        padding-left: 30px;
+        }
+    </style>
 </head>
 
 <body>
-    <h1><a href="index.html">WEB</a><h2>
-    <ol>
-        <li><a href="1.html">HTML</a></li>
-        <li><a href="2.html">CSS</a></li>
-        <li><a href="3.html">JavaScript</a></li>
-    </ol>
+    <h1><a href="index.html">WEB</a></h1>
+    <div id="grid">
+        <div>
+            <ol>
+                <li><a href="1.html" >HTML</a></li>
+                <li><a href="2.html" id="active">CSS</a></li>
+                <li><a href="3.html">JavaScript</a></li>
+            </ol>
+        </div>
+            <!--
+            <h1><a href="index.html"><font color="red">WEB</font></a><h2>
+            <ol>
+                <li><a href="1.html"><font color="red">HTML</font></a></li>
+                <li><a href="2.html"><font color="red">CSS</font></a></li>
+                <li><a href="3.html"><font color="red">JavaScript</font></a></li>
+            </ol>
+            -->
+        <div id="article">
+            <h2>JavaScript란 무엇인가?</h2>
+            <p>JavaScript is a versatile and widely used programming language primarily known for its role in web development. It is an object-oriented, high-level scripting language that allows developers to add dynamic and interactive features to websites. JavaScript is often embedded directly into HTML code and executed by web browsers, enabling client-side scripting.
 
-<h2>JavaScript란 무엇인가?</h2>
-<p>JavaScript is a versatile and widely used programming language primarily known for its role in web development. It is an object-oriented, high-level scripting language that allows developers to add dynamic and interactive features to websites. JavaScript is often embedded directly into HTML code and executed by web browsers, enabling client-side scripting.
-
-    The language was initially created to make web pages more interactive by enabling them to respond to user actions without needing to communicate with the server. With JavaScript, developers can manipulate the Document Object Model (DOM), which represents the structure of a web page, in real-time. This enables features such as form validation, image sliders, and interactive user interfaces.
-    
-    JavaScript has evolved beyond its initial use in web development and is now employed in various environments, including server-side development (Node.js), mobile app development, and even in non-browser contexts such as game development (using frameworks like Phaser or Three.js). Its versatility, along with its support in modern web browsers, has made JavaScript a fundamental technology in the world of software development.</p>
+            The language was initially created to make web pages more interactive by enabling them to respond to user actions without needing to communicate with the server. With JavaScript, developers can manipulate the Document Object Model (DOM), which represents the structure of a web page, in real-time. This enables features such as form validation, image sliders, and interactive user interfaces.
+            
+            JavaScript has evolved beyond its initial use in web development and is now employed in various environments, including server-side development (Node.js), mobile app development, and even in non-browser contexts such as game development (using frameworks like Phaser or Three.js). Its versatility, along with its support in modern web browsers, has made JavaScript a fundamental technology in the world of software development.</p>
+        </div2>
 </body>
